@@ -16,4 +16,4 @@ This is the official repository for the [DLEST](https://doi.org/10.1007/978-3-03
 
 
 ## Acknowledgement
-Our code took reference from the [latenet-energy-transport](https://github.com/YangNaruto/latent-energy-transport) repository.
+Our code was inspired by the [latenet-energy-transport](https://github.com/YangNaruto/latent-energy-transport) repository.
