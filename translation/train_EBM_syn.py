@@ -68,7 +68,6 @@ import re
 from pathlib import Path
 import pandas as pd
 from tqdm.auto import tqdm, trange
-# from skimage.metrics import structural_similarity as ssim
 from kornia.losses import ssim_loss,psnr_loss
 
 from content_style_loss import calculate_losses
@@ -153,43 +152,7 @@ class ImageFolder(data.Dataset):
 	def __len__(self):
 		return len(self.imgs)
 
-# class MRIDataset_processed_p(data.Dataset):
-# 	FILETYPE = ['nii','npy']
-# 	def __init__(self,image_dir:str,filetype:str,slice_range:int,annotation_file=None): 
-# 		assert Path(image_dir).is_dir(), f'{image_dir} is not a valid directory'
-# 		# if annotation_file is not None: assert Path(annotation_file).is_file(), f'{annotation_file} is not a valid file'
-# 		assert filetype in MRIDataset_processed_p.FILETYPE, f'filetype must be in {MRIDataset_processed_p.FILETYPE}'
-		
-# 		self.slice_range = slice_range
-# 		self.img_dir = image_dir
-# 		self.src_label = pd.read_csv(annotation_file[0],sep='\t')
-# 		self.tar_label = pd.read_csv(annotation_file[1],sep='\t')
-# 		self.filetype = filetype
-# 		self.length = len(self.src_label)
 
-# 	def __len__(self):
-# 		return self.length
-
-# 	def __getitem__(self,idx):
-# 		img_path_base = Path(self.img_dir)
-# 		fn_src = self.src_label.iloc[idx,0]
-# 		subject_id = self.src_label.iloc[idx,1]
-# 		fn_tar = list(self.tar_label.loc[self.tar_label['subject_id']==subject_id]['filename'])[0] # get the filename of the first matched entry
-# 		src_path_full = str(next(img_path_base.glob(f'*{fn_src}*.npy')))
-# 		tar_path_full = str(next(img_path_base.glob(f'*{fn_tar}*.npy')))
-
-# 		src_volume = np.load(src_path_full)
-# 		tar_volume = np.load(tar_path_full)
-			
-# 		# src_label = self.src_label.iloc[idx,1]+self.src_label.iloc[idx,2]
-# 		# tar_label = fn_tar[:15]
-# 		# label = torch.tensor(label,device='cpu')
-# 		src_volume = torch.tensor(src_volume,device='cpu')
-# 		tar_volume = torch.tensor(tar_volume,device='cpu')
-# 		# print('min, max, mean after normalization: ',[src_volume.min(),src_volume.max(),src_volume.mean()])
-# 		# print(src_volume.shape)
-# 		# print(type(src_volume))
-# 		return src_volume,tar_volume
 class MRIDataset_processed(data.Dataset):
 	FILETYPE = ['nii','npy']
 	def __init__(self,image_dir:str,filetype:str,slice_range:int,annotation_file=None): 
@@ -232,7 +195,6 @@ def langvin_sampler(model, x,y, langevin_steps=20, lr=1.0, sigma=0e-2, return_se
 	content_criteria = torch.nn.L1Loss() # l1 loss
 
 	x.requires_grad_(True)
-	# sgd = optim.SGD([x], lr=lr)
 	sgd = SGLD([x], lr=lr, std_dev=sigma)
 	sequence = torch.zeros_like(x).unsqueeze(0).repeat(langevin_steps, 1, 1)
 	for k in range(langevin_steps):
@@ -248,18 +210,14 @@ def langvin_sampler(model, x,y, langevin_steps=20, lr=1.0, sigma=0e-2, return_se
    
 			org_latent = x_orig.unsqueeze(1).repeat(1, ae.mapping_fl.num_layers, 1)
 			org_slices = decode(ae,org_latent,cfg)
-			# loss_content = 1-content_criteria(target_slice.squeeze().cpu().numpy(),recon_slices.squeeze().cpu().detach().numpy(),channel_axis=0) # old SSIM loss
-			# content_criteria = torch.nn.L1Loss()
-			# loss_content = content_criteria(recon_slices,target_slice)
+
 			closs, sloss = calculate_losses(cnn,target_slice.repeat(1,3,1,1),org_slices.repeat(1,3,1,1),recon_slices.repeat(1,3,1,1),style_weight=1e6,content_weight=0.1)
 			loss_content = content_criteria(y,x)
 			loss = 1*(-energy) + closs + sloss + 10*loss_content # for style, content loss
 		else:
 			loss_content = content_criteria(y,x) # for l1 l2 loss
 			loss = 1*(-energy)+10*loss_content # for l1 l2 loss
-		# loss = (-energy)
 		loss.backward()
-		# (-energy).backward()
 		sgd.step()
 
 	if return_seq:
@@ -275,7 +233,6 @@ def neg_langvin_sampler(model, x,y, langevin_steps=20, lr=1.0, sigma=0e-2, retur
 	content_criteria = torch.nn.L1Loss() # l1 loss
 
 	x.requires_grad_(True)
-	# sgd = optim.SGD([x], lr=lr)
 	sgd = SGLD([x], lr=lr, std_dev=sigma)
 	sequence = torch.zeros_like(x).unsqueeze(0).repeat(langevin_steps, 1, 1)
 	for k in range(langevin_steps):
@@ -291,9 +248,7 @@ def neg_langvin_sampler(model, x,y, langevin_steps=20, lr=1.0, sigma=0e-2, retur
    
 			org_latent = x_orig.unsqueeze(1).repeat(1, ae.mapping_fl.num_layers, 1)
 			org_slices = decode(ae,org_latent,cfg)
-			# loss_content = 1-content_criteria(target_slice.squeeze().cpu().numpy(),recon_slices.squeeze().cpu().detach().numpy(),channel_axis=0) # old SSIM loss
-			# content_criteria = torch.nn.L1Loss()
-			# loss_content = content_criteria(recon_slices,target_slice)
+
 			closs, sloss = calculate_losses(cnn,target_slice.repeat(1,3,1,1),org_slices.repeat(1,3,1,1),recon_slices.repeat(1,3,1,1),style_weight=1e6,content_weight=0.1)
 			loss_content = content_criteria(y,x)
 			loss = -(1*(-energy) + closs + sloss+ 10*loss_content) # for style, content loss
@@ -303,7 +258,6 @@ def neg_langvin_sampler(model, x,y, langevin_steps=20, lr=1.0, sigma=0e-2, retur
 
 
 		loss.backward()
-		# (-energy).backward()
 		sgd.step()
 
 	if return_seq:
@@ -379,7 +333,6 @@ def check_folder(log_dir):
 def encode(model, x, cfg):
 
 	Z, _ = model.encode(x, cfg.MODEL.LAYER_COUNT - 1, 1)
-	# Z = Z.repeat(1, ae.mapping_fl.num_layers, 1)
 	return Z.squeeze(1)
 
 #
@@ -387,7 +340,6 @@ def decode(model, x, cfg):
 	layer_idx = torch.arange(2 * cfg.MODEL.LAYER_COUNT)[np.newaxis, :, np.newaxis]
 	ones = torch.ones(layer_idx.shape, dtype=torch.float32)
 	coefs = torch.where(layer_idx < model.truncation_cutoff, ones, ones)
-	# x = torch.lerp(model.dlatent_avg.buff.data, x, coefs)
 	return model.decoder(x, cfg.MODEL.LAYER_COUNT - 1, 1, noise=True)
 
   
@@ -506,7 +458,7 @@ def train(cfg, logger):
     
 				target_latent = target_latent.squeeze()
 
-				requires_grad(latent_ebm, False) # may need to reqire grad for ebm to be updated on loss_content
+				requires_grad(latent_ebm, False) 
 				source_latent_q,_ = langvin_sampler(latent_ebm, source_latent.clone().detach(),target_latent.clone().detach(),
 												langevin_steps=cfg.LANGEVIN.STEP, lr=cfg.LANGEVIN.LR,target_slice=target_slices,ae=ae,cfg=cfg,pix=SGLD_PIX)
 	
@@ -642,7 +594,5 @@ def train(cfg, logger):
 
 if __name__ == "__main__":
 	gpu_count = 1
-	run(train, get_cfg_defaults(), description='Image-Translation', default_config='ALAE/configs/OpenBHB_syn.yaml',
+	run(train, get_cfg_defaults(), description='Image-Translation', default_config='configs/OpenBHB_syn.yaml',
 		world_size=gpu_count, write_log=False)
-	# run(train, get_cfg_defaults(), description='Image-Translation', default_config='ALAE\configs\celeba-hq1024.yaml',
-	# 	world_size=gpu_count, write_log=False)

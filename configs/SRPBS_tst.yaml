@@ -1,4 +1,4 @@
-# Config for training ALAE on OpenBHB with 256*256 resolution
+# Config for training ALAE on SRPBS with 256*256 resolution
 
 NAME: SRPBS_tst
 DATA:

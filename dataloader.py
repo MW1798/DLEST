@@ -65,7 +65,7 @@ class TFRecordsDataset:
 		dataset_path = dataset_root / cfg.DATA.NAME 
 
 		label_path = dataset_root / cfg.DATASET.LABEL
-		self.dataset = dataset_util.MRIDataset_processed(str(dataset_path),'npy',5,transform=True,annotation_file= label_path)
+		self.dataset = dataset_util.MRIDataset_processed(str(dataset_path),'npy',5,transform=True,annotation_file= label_path) # create dataset
 		print(f'finished loading image data from {dataset_path}')
 
 	def data_sampler(self, dataset, shuffle, distributed):

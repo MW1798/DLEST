@@ -38,7 +38,6 @@ import torchvision.utils
 from torchvision.utils import save_image
 from net import *
 import os
-# os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
 import utils
 from checkpointer import Checkpointer
 from scheduler import ComboMultiStepLR
@@ -378,10 +377,8 @@ def train(cfg, logger, local_rank, world_size, distributed):
 			scheduler.step()
 			
 
-			# if min_total_loss == 0 or current_total_loss < min_total_loss:
 			if epoch_SSIM > best_ssim:
-				# min_total_loss = current_total_loss
-				# current_total_loss = 0
+
 				best_ssim = epoch_SSIM
 				checkpointer.save(f"model_tmp_opt_{epoch+1}")
 			save_sample(lod2batch, tracker, sample[:,0,:,:].unsqueeze(1).float(), samplez, logger, model_s, cfg, encoder_optimizer, decoder_optimizer)

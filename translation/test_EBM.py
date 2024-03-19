@@ -386,7 +386,7 @@ def test(cfg, logger):
 
 if __name__ == "__main__":
 	gpu_count = 1
-	run(test, get_cfg_defaults(), description='Image-Translation', default_config='ALAE/configs/SRPBS_tst.yaml',
+	run(test, get_cfg_defaults(), description='Image-Translation', default_config='configs/SRPBS_tst.yaml',
 		world_size=gpu_count, write_log=False)
-	# run(train, get_cfg_defaults(), description='Image-Translation', default_config='ALAE\configs\celeba-hq1024.yaml',
+	# run(train, get_cfg_defaults(), description='Image-Translation', default_config='configs\celeba-hq1024.yaml',
 	# 	world_size=gpu_count, write_log=False)

@@ -27,9 +27,9 @@ MODEL:
   DLATENT_AVG_BETA: 0.995
   MAPPING_LAYERS: 8
   CHANNELS: 1
-# OUTPUT_DIR: training_artifacts/ALAE_10SSIM
-OUTPUT_DIR: training_artifacts/openBHB_2_10xLpixel # best performing so far
-# OUTPUT_DIR: training_artifacts/openBHB_1 # no pixel loss
+
+OUTPUT_DIR: training_artifacts/openBHB_2_10xLpixel 
+
 TRAIN:
   BASE_LEARNING_RATE: 0.0015
   EPOCHS_PER_LOD: 0

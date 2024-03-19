@@ -506,8 +506,8 @@ def train(cfg, logger):
 
 if __name__ == "__main__":
 	gpu_count = 1
-	# run(train, get_cfg_defaults(), description='Image-Translation', default_config='ALAE/configs/SRPBS.yaml',
+	# run(train, get_cfg_defaults(), description='Image-Translation', default_config='configs/SRPBS.yaml',
 	# 	world_size=gpu_count, write_log=False)
-	run(train, get_cfg_defaults(), description='Image-Translation', default_config='ALAE/configs/OpenBHB_1.yaml',
+	run(train, get_cfg_defaults(), description='Image-Translation', default_config='configs/OpenBHB_1.yaml',
 			world_size=gpu_count, write_log=False)
 
