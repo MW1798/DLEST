@@ -1,0 +1,46 @@
+# Config for training ALAE on OpenBHB with 256*256 resolution
+
+NAME: OpenBHB
+DATA:
+  ROOT: F:/OpenBHB
+  NAME: train_quasiraw_10slices
+  SOURCE: site_cl_source_~17
+  TARGET: site_17
+  BATCH: 64
+LANGEVIN:
+  STEP: 20
+  LR: 1.0
+EBM:
+  LR: 0.005
+  OPT: 'sgd'
+  LAYER: 2
+  HIDDEN: 2048
+  EPOCHS: 10
+DATASET:
+  ROOT: train
+  LABEL: train_labels/official_site_class_labels.tsv
+  MAX_RESOLUTION_LEVEL: 8
+MODEL:
+  LATENT_SPACE_SIZE: 512
+  LAYER_COUNT: 7
+  MAX_CHANNEL_COUNT: 256
+  START_CHANNEL_COUNT: 64
+  DLATENT_AVG_BETA: 0.995
+  MAPPING_LAYERS: 8
+  CHANNELS: 1
+# OUTPUT_DIR: training_artifacts/ALAE_10L1
+# OUTPUT_DIR: training_artifacts/ALAE_10L1_FLOPs
+OUTPUT_DIR: training_artifacts/ALAE_100perceptual
+TRAIN:
+  BASE_LEARNING_RATE: 0.0015
+  EPOCHS_PER_LOD: 0
+  LEARNING_DECAY_RATE: 0.1
+  LEARNING_DECAY_STEPS: []
+  TRAIN_EPOCHS: 5
+  #                    4       8       16       32       64       128        256       512       1024
+  # LOD_2_BATCH_8GPU: [512,    256,     128,      64,      32,       32,        32,       32,        24]
+  # LOD_2_BATCH_4GPU: [512,    256,     128,      64,      32,       32,        32,       32,        16]
+  # LOD_2_BATCH_2GPU: [128,    128,     128,      64,      32,       32,        16]
+  LOD_2_BATCH_1GPU: [14,    14,     14,      14,      14,       14]
+
+  LEARNING_RATES: [0.0015,  0.0015,   0.0015,   0.0015,  0.0015,   0.0015,     0.0015,     0.003,    0.003]

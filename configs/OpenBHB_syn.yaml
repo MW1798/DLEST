@@ -1,0 +1,48 @@
+# Config for training ALAE on OpenBHB with 256*256 resolution
+
+NAME: SRPBS
+DATA:
+  # ROOT: F:/SRPBS_fsl
+  ROOT: F:/OpenBHB
+  # NAME: SRPBS_npy_14slices
+  NAME: train_quasiraw_10slices
+  SOURCE: site_cl_source_~17
+  TARGET: site_17
+  BATCH: 12
+LANGEVIN:
+  STEP: 20
+  LR: 1.0
+EBM:
+  LR: 0.005
+  OPT: 'sgd'
+  LAYER: 2
+  HIDDEN: 2048
+  EPOCHS: 40
+  WEIGHTS: '00030-ls20-lr0.0050-h2048-layer2-Syn_Site17_tst3'
+DATASET:
+  ROOT: train
+  MAX_RESOLUTION_LEVEL: 8
+MODEL:
+  LATENT_SPACE_SIZE: 512
+  LAYER_COUNT: 7
+  MAX_CHANNEL_COUNT: 256
+  START_CHANNEL_COUNT: 64
+  DLATENT_AVG_BETA: 0.995
+  MAPPING_LAYERS: 8
+  CHANNELS: 1
+# OUTPUT_DIR: training_artifacts/ALAE_10SSIM
+OUTPUT_DIR: training_artifacts/openBHB_2_10xLpixel # best performing so far
+# OUTPUT_DIR: training_artifacts/openBHB_1 # no pixel loss
+TRAIN:
+  BASE_LEARNING_RATE: 0.0015
+  EPOCHS_PER_LOD: 0
+  LEARNING_DECAY_RATE: 0.1
+  LEARNING_DECAY_STEPS: []
+  TRAIN_EPOCHS: 30
+  #                    4       8       16       32       64       128        256       512       1024
+  # LOD_2_BATCH_8GPU: [512,    256,     128,      64,      32,       32,        32,       32,        24]
+  # LOD_2_BATCH_4GPU: [512,    256,     128,      64,      32,       32,        32,       32,        16]
+  # LOD_2_BATCH_2GPU: [128,    128,     128,      64,      32,       32,        16]
+  LOD_2_BATCH_1GPU: [16,    16,     16,      16,      16,       16]
+
+  LEARNING_RATES: [0.0015,  0.0015,   0.0015,   0.0015,  0.0015,   0.0015,     0.0015,     0.003,    0.003]
